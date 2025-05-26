@@ -1,0 +1,342 @@
+@model IEnumerable<BUIC_ASP_PROJECT.Models.StudentCourse>
+@{
+    ViewData["Title"] = "Registration Reports";
+    
+    // Calculate statistics
+    var totalRegistrations = Model.Count();
+    var uniqueStudents = Model.Select(r => r.StudentId).Distinct().Count();
+    var uniqueCourses = Model.Select(r => r.CourseId).Distinct().Count();
+    
+    // Group by course for course statistics
+    var courseGroups = Model.GroupBy(r => r.Course)
+        .Select(g => new {
+            Course = g.Key,
+            EnrollmentCount = g.Count(),
+            EnrollmentPercentage = ((double)g.Count() / uniqueStudents) * 100
+        })
+        .OrderByDescending(g => g.EnrollmentCount)
+        .ToList();
+        
+    // Group by semester for trend analysis
+    var semesterGroups = Model.GroupBy(r => r.Course.Semester)
+        .Select(g => new {
+            Semester = g.Key,
+            Registrations = g.Count(),
+            Students = g.Select(sc => sc.StudentId).Distinct().Count(),
+            Courses = g.Select(sc => sc.CourseId).Distinct().Count()
+        })
+        .OrderBy(g => g.Semester)
+        .ToList();
+}
+
+<div class="container-fluid py-4">
+    <h1 class="display-4 mb-4">Course Registration Reports</h1>
+    
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card shadow-sm bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Registrations</h5>
+                    <h2 class="mb-0">@totalRegistrations</h2>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow-sm bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Students Enrolled</h5>
+                    <h2 class="mb-0">@uniqueStudents</h2>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow-sm bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Active Courses</h5>
+                    <h2 class="mb-0">@uniqueCourses</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Course Popularity</h5>
+                        <button type="button" class="btn btn-sm btn-light" onclick="exportToExcel('courseTable')">
+                            <i class="bi bi-file-earmark-excel me-1"></i> Export
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-7">
+                            <div class="table-responsive">
+                                <table id="courseTable" class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Course Code</th>
+                                            <th>Title</th>
+                                            <th>Instructor</th>
+                                            <th>Enrollment</th>
+                                            <th>% of Students</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var group in courseGroups)
+                                        {
+                                            <tr>
+                                                <td>@group.Course.CourseCode</td>
+                                                <td>@group.Course.Title</td>
+                                                <td>@(group.Course.Instructor?.User?.FirstName + " " + group.Course.Instructor?.User?.LastName)</td>
+                                                <td>@group.EnrollmentCount</td>
+                                                <td>
+                                                    <div class="progress" style="height: 20px;">
+                                                        <div class="progress-bar bg-success" role="progressbar" 
+                                                             style="width: @group.EnrollmentPercentage%;" 
+                                                             aria-valuenow="@group.EnrollmentPercentage" aria-valuemin="0" aria-valuemax="100">
+                                                            @group.EnrollmentPercentage.ToString("N1")%
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-5">
+                            <canvas id="courseChart" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Registration Trends by Semester</h5>
+                        <button type="button" class="btn btn-sm btn-light" onclick="exportToExcel('semesterTable')">
+                            <i class="bi bi-file-earmark-excel me-1"></i> Export
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-7">
+                            <div class="table-responsive">
+                                <table id="semesterTable" class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Semester</th>
+                                            <th>Registrations</th>
+                                            <th>Students</th>
+                                            <th>Courses</th>
+                                            <th>Avg. Courses per Student</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var group in semesterGroups)
+                                        {
+                                            var avgCoursesPerStudent = group.Students > 0 ? (double)group.Registrations / group.Students : 0;
+                                            <tr>
+                                                <td>@group.Semester</td>
+                                                <td>@group.Registrations</td>
+                                                <td>@group.Students</td>
+                                                <td>@group.Courses</td>
+                                                <td>@avgCoursesPerStudent.ToString("N1")</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-5">
+                            <canvas id="trendChart" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Detailed Registration Records</h5>
+                        <div>
+                            <button type="button" class="btn btn-sm btn-light me-2" onclick="printReport()">
+                                <i class="bi bi-printer me-1"></i> Print
+                            </button>
+                            <button type="button" class="btn btn-sm btn-light" onclick="exportToExcel('detailedTable')">
+                                <i class="bi bi-file-earmark-excel me-1"></i> Export
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <input type="text" id="searchInput" class="form-control" placeholder="Search by student name, ID, or course...">
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table id="detailedTable" class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Student ID</th>
+                                    <th>Student Name</th>
+                                    <th>Course Code</th>
+                                    <th>Course Title</th>
+                                    <th>Semester</th>
+                                    <th>Enrollment Date</th>
+                                    <th>Grade</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var registration in Model)
+                                {
+                                    <tr>
+                                        <td>@registration.Student.StudentNumber</td>
+                                        <td>@(registration.Student.User.FirstName + " " + registration.Student.User.LastName)</td>
+                                        <td>@registration.Course.CourseCode</td>
+                                        <td>@registration.Course.Title</td>
+                                        <td>@registration.Course.Semester</td>
+                                        <td>@registration.EnrollmentDate.ToString("MMM dd, yyyy")</td>
+                                        <td>
+                                            @if (string.IsNullOrEmpty(registration.Grade))
+                                            {
+                                                <span class="badge bg-secondary">In Progress</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge @(registration.Grade == "F" ? "bg-danger" : "bg-success")">@registration.Grade</span>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Search functionality
+            $("#searchInput").on("keyup", function() {
+                var value = $(this).val().toLowerCase();
+                $("#detailedTable tbody tr").filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+            });
+            
+            // Course popularity chart
+            var courseCtx = document.getElementById('courseChart').getContext('2d');
+            var courseData = {
+                labels: [@Html.Raw(string.Join(",", courseGroups.Take(5).Select(g => "'" + g.Course.CourseCode + "'")))],
+                datasets: [{
+                    label: 'Enrollments',
+                    data: [@string.Join(",", courseGroups.Take(5).Select(g => g.EnrollmentCount))],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.6)',
+                        'rgba(54, 162, 235, 0.6)',
+                        'rgba(255, 206, 86, 0.6)',
+                        'rgba(75, 192, 192, 0.6)',
+                        'rgba(153, 102, 255, 0.6)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            };
+            var courseChart = new Chart(courseCtx, {
+                type: 'bar',
+                data: courseData,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Top 5 Courses by Enrollment'
+                        },
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+            
+            // Registration trends chart
+            var trendCtx = document.getElementById('trendChart').getContext('2d');
+            var trendData = {
+                labels: [@Html.Raw(string.Join(",", semesterGroups.Select(g => "'" + g.Semester + "'")))],
+                datasets: [{
+                    label: 'Registrations',
+                    data: [@string.Join(",", semesterGroups.Select(g => g.Registrations))],
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 2,
+                    fill: false,
+                    tension: 0.1
+                }]
+            };
+            var trendChart = new Chart(trendCtx, {
+                type: 'line',
+                data: trendData,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Registration Trends by Semester'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        });
+        
+        // Print report
+        function printReport() {
+            window.print();
+        }
+        
+        // Export to Excel
+        function exportToExcel(tableId) {
+            // In a real application, this would use a library like SheetJS or call a server endpoint
+            // For simplicity, we'll just simulate a download
+            alert("Exporting table to Excel... In a real application, this would download an Excel file.");
+        }
+    </script>
+}

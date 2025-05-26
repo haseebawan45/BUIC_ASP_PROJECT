@@ -1,0 +1,119 @@
+@model BUIC_ASP_PROJECT.Models.RegisterViewModel
+
+@{
+    ViewData["Title"] = "Register New User";
+}
+
+<div class="container my-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="text-center">Register New User</h2>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Register" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="FirstName" class="form-label"></label>
+                                <input asp-for="FirstName" class="form-control" />
+                                <span asp-validation-for="FirstName" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="LastName" class="form-label"></label>
+                                <input asp-for="LastName" class="form-control" />
+                                <span asp-validation-for="LastName" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label"></label>
+                            <input asp-for="Email" class="form-control" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label asp-for="Password" class="form-label"></label>
+                                <input asp-for="Password" class="form-control" />
+                                <span asp-validation-for="Password" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="ConfirmPassword" class="form-label"></label>
+                                <input asp-for="ConfirmPassword" class="form-control" />
+                                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="UserType" class="form-label"></label>
+                            <select asp-for="UserType" class="form-select" id="userType">
+                                <option value="@UserType.Student">Student</option>
+                                <option value="@UserType.Faculty">Faculty</option>
+                                <option value="@UserType.Admin">Admin</option>
+                            </select>
+                            <span asp-validation-for="UserType" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="mb-3" id="userNumberDiv">
+                            <label asp-for="UserNumber" class="form-label">Student/Faculty Number</label>
+                            <input asp-for="UserNumber" class="form-control" />
+                            <span asp-validation-for="UserNumber" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="mb-3" id="departmentDiv">
+                            <label asp-for="Department" class="form-label"></label>
+                            <input asp-for="Department" class="form-control" />
+                            <span asp-validation-for="Department" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="mb-3" id="programDiv">
+                            <label asp-for="Program" class="form-label"></label>
+                            <input asp-for="Program" class="form-control" />
+                            <span asp-validation-for="Program" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">Register</button>
+                            <a asp-controller="Admin" asp-action="UserManagement" class="btn btn-secondary">Back to Users</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        $(document).ready(function() {
+            function toggleFields() {
+                var userType = $("#userType").val();
+                
+                if (userType === "@((int)UserType.Admin)") {
+                    $("#userNumberDiv").hide();
+                    $("#departmentDiv").hide();
+                    $("#programDiv").hide();
+                } else if (userType === "@((int)UserType.Faculty)") {
+                    $("#userNumberDiv").show();
+                    $("#departmentDiv").show();
+                    $("#programDiv").hide();
+                } else {
+                    $("#userNumberDiv").show();
+                    $("#departmentDiv").hide();
+                    $("#programDiv").show();
+                }
+            }
+            
+            // Initial state
+            toggleFields();
+            
+            // On change
+            $("#userType").change(toggleFields);
+        });
+    </script>
+} 

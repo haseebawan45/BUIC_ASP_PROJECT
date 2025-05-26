@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\BUIC_ASP_PROJECT.props" />
+</Project>

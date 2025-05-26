@@ -1,0 +1,50 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="container my-5">
+    <div class="row align-items-center">
+        <div class="col-md-6">
+            <h1 class="display-4 fw-bold">Smart Campus Portal</h1>
+            <p class="lead">A comprehensive web-based system for university automation.</p>
+            <p>Manage courses, assignments, grades, and more - all in one place.</p>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                <a asp-controller="Account" asp-action="Login" class="btn btn-primary btn-lg px-4 me-md-2">Login</a>
+                <a asp-controller="Home" asp-action="About" class="btn btn-outline-secondary btn-lg px-4">Learn More</a>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <img src="https://via.placeholder.com/600x400?text=Campus+Portal" class="img-fluid rounded shadow" alt="Campus Portal">
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-user-graduate fa-3x text-primary mb-3"></i>
+                    <h3>Students</h3>
+                    <p>Register for courses, view grades, submit assignments, and track your academic progress.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-chalkboard-teacher fa-3x text-primary mb-3"></i>
+                    <h3>Faculty</h3>
+                    <p>Manage courses, create assignments, grade submissions, and communicate with students.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-university fa-3x text-primary mb-3"></i>
+                    <h3>Administration</h3>
+                    <p>Oversee campus operations, manage users, generate reports, and ensure smooth functioning.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,210 @@
+@model BUIC_ASP_PROJECT.Controllers.UserManagementViewModel
+
+@{
+    ViewData["Title"] = "User Management";
+}
+
+<div class="container my-4">
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>User Management</h1>
+        <a asp-controller="Account" asp-action="Register" class="btn btn-primary">
+            <i class="fas fa-user-plus me-2"></i> Add New User
+        </a>
+    </div>
+
+    <ul class="nav nav-tabs mb-4" id="userTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="students-tab" data-bs-toggle="tab" data-bs-target="#students" type="button" role="tab" aria-controls="students" aria-selected="true">
+                <i class="fas fa-user-graduate me-2"></i> Students
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="faculty-tab" data-bs-toggle="tab" data-bs-target="#faculty" type="button" role="tab" aria-controls="faculty" aria-selected="false">
+                <i class="fas fa-chalkboard-teacher me-2"></i> Faculty
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="userTabsContent">
+        <div class="tab-pane fade show active" id="students" role="tabpanel" aria-labelledby="students-tab">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered" id="studentsTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Student Number</th>
+                                    <th>Program</th>
+                                    <th>Semester</th>
+                                    <th>GPA</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.Students != null && Model.Students.Any())
+                                {
+                                    foreach (var student in Model.Students)
+                                    {
+                                        <tr>
+                                            <td>@student.StudentId</td>
+                                            <td>@student.User.FirstName @student.User.LastName</td>
+                                            <td>@student.User.Email</td>
+                                            <td>@student.StudentNumber</td>
+                                            <td>@student.Program</td>
+                                            <td>@student.Semester</td>
+                                            <td>@student.GPA</td>
+                                            <td>
+                                                <div class="btn-group">
+                                                    <button type="button" class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-outline-danger">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="8" class="text-center">No students found.</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="faculty" role="tabpanel" aria-labelledby="faculty-tab">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered" id="facultyTable" width="100%" cellspacing="0">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Faculty Number</th>
+                                    <th>Department</th>
+                                    <th>Designation</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @if (Model.FacultyMembers != null && Model.FacultyMembers.Any())
+                                {
+                                    foreach (var faculty in Model.FacultyMembers)
+                                    {
+                                        <tr>
+                                            <td>@faculty.FacultyId</td>
+                                            <td>@faculty.User.FirstName @faculty.User.LastName</td>
+                                            <td>@faculty.User.Email</td>
+                                            <td>@faculty.FacultyNumber</td>
+                                            <td>@faculty.Department</td>
+                                            <td>@faculty.Designation</td>
+                                            <td>
+                                                <div class="btn-group">
+                                                    <button type="button" class="btn btn-sm btn-outline-primary">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-sm btn-outline-danger">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                }
+                                else
+                                {
+                                    <tr>
+                                        <td colspan="7" class="text-center">No faculty members found.</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Fade out alerts after 5 seconds
+            setTimeout(function() {
+                $(".alert").fadeOut("slow");
+            }, 5000);
+
+            // Initialize DataTables with improved error handling
+            function initializeDataTable(tableId, actionColumnIndex) {
+                if ($(tableId).length === 0) {
+                    console.warn("Table not found: " + tableId);
+                    return null;
+                }
+
+                try {
+                    return $(tableId).DataTable({
+                        "responsive": true,
+                        "processing": true,
+                        "paging": true,
+                        "searching": true,
+                        "ordering": true,
+                        "info": true,
+                        "autoWidth": false,
+                        "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                        "language": {
+                            "emptyTable": "No data available",
+                            "info": "Showing _START_ to _END_ of _TOTAL_ entries",
+                            "infoEmpty": "Showing 0 to 0 of 0 entries",
+                            "infoFiltered": "(filtered from _MAX_ total entries)",
+                            "search": "Search:",
+                            "zeroRecords": "No matching records found"
+                        },
+                        "columnDefs": [
+                            { "orderable": false, "targets": actionColumnIndex }
+                        ]
+                    });
+                } catch (e) {
+                    console.error("DataTables initialization error for " + tableId + ":", e);
+                    // Apply basic styling as fallback
+                    $(tableId).addClass("table-striped");
+                    return null;
+                }
+            }
+
+            // Initialize tables
+            var studentsTable = initializeDataTable("#studentsTable", 7); // Action column at index 7
+            var facultyTable = initializeDataTable("#facultyTable", 6);  // Action column at index 6
+
+            // Handle tab switching to redraw tables (fixes layout issues when switching tabs)
+            $('a[data-bs-toggle="tab"]').on('shown.bs.tab', function (e) {
+                if (studentsTable) studentsTable.columns.adjust().responsive.recalc();
+                if (facultyTable) facultyTable.columns.adjust().responsive.recalc();
+            });
+        });
+    </script>
+}

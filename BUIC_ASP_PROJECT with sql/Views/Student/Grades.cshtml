@@ -1,0 +1,224 @@
+@model IEnumerable<BUIC_ASP_PROJECT.Models.StudentCourse>
+@{
+    ViewData["Title"] = "Academic Grades";
+    var gradeScale = new Dictionary<string, string>() {
+        { "A", "90-100" },
+        { "B+", "85-89" },
+        { "B", "80-84" },
+        { "C+", "75-79" },
+        { "C", "70-74" },
+        { "D+", "65-69" },
+        { "D", "60-64" },
+        { "F", "Below 60" }
+    };
+}
+
+<div class="container-fluid py-4">
+    <h1 class="display-4 mb-4">Academic Grades</h1>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Course Grades</h5>
+                </div>
+                <div class="card-body">
+                    @if (!Model.Any())
+                    {
+                        <div class="alert alert-info">
+                            You are not enrolled in any courses yet.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Course Code</th>
+                                        <th>Course Title</th>
+                                        <th>Credit Hours</th>
+                                        <th>Grade</th>
+                                        <th>Grade Points</th>
+                                        <th>Weighted Points</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{
+                                        decimal totalCreditHours = 0;
+                                        decimal totalWeightedPoints = 0;
+                                    }
+                                    
+                                    @foreach (var enrollment in Model)
+                                    {
+                                        var course = enrollment.Course;
+                                        var letterGrade = enrollment.Grade;
+                                        decimal gradePoints = 0;
+                                        
+                                        switch (letterGrade)
+                                        {
+                                            case "A": gradePoints = 4.0m; break;
+                                            case "B+": gradePoints = 3.5m; break;
+                                            case "B": gradePoints = 3.0m; break;
+                                            case "C+": gradePoints = 2.5m; break;
+                                            case "C": gradePoints = 2.0m; break;
+                                            case "D+": gradePoints = 1.5m; break;
+                                            case "D": gradePoints = 1.0m; break;
+                                            case "F": gradePoints = 0.0m; break;
+                                            default: gradePoints = 0.0m; break;
+                                        }
+                                        
+                                        var weightedPoints = gradePoints * course.CreditHours;
+                                        totalCreditHours += course.CreditHours;
+                                        totalWeightedPoints += weightedPoints;
+                                        
+                                        <tr>
+                                            <td>@course.CourseCode</td>
+                                            <td>@course.Title</td>
+                                            <td>@course.CreditHours</td>
+                                            <td>
+                                                @if (string.IsNullOrEmpty(letterGrade))
+                                                {
+                                                    <span class="badge bg-secondary">In Progress</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge @(letterGrade == "F" ? "bg-danger" : "bg-success")">@letterGrade</span>
+                                                }
+                                            </td>
+                                            <td>@gradePoints.ToString("0.0")</td>
+                                            <td>@weightedPoints.ToString("0.0")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                                <tfoot>
+                                    <tr class="table-primary">
+                                        <td colspan="2"><strong>Total</strong></td>
+                                        <td><strong>@totalCreditHours</strong></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td><strong>@totalWeightedPoints.ToString("0.0")</strong></td>
+                                    </tr>
+                                    <tr class="table-success">
+                                        <td colspan="2"><strong>Current GPA</strong></td>
+                                        <td colspan="4"><strong>@(totalCreditHours > 0 ? (totalWeightedPoints / totalCreditHours).ToString("0.00") : "0.00")</strong></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0">Assignment Grades</h5>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.Submissions == null || !ViewBag.Submissions.Any())
+                    {
+                        <div class="alert alert-info">
+                            No assignments have been submitted yet.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Assignment</th>
+                                        <th>Course</th>
+                                        <th>Grade</th>
+                                        <th>Feedback</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var submission in ViewBag.Submissions)
+                                    {
+                                        <tr>
+                                            <td>@submission.Assignment.Title</td>
+                                            <td>@submission.Assignment.Course.CourseCode</td>
+                                            <td>
+                                                @if (submission.Grade.HasValue)
+                                                {
+                                                    <span class="@(submission.Grade.Value >= submission.Assignment.MaxPoints * 0.6m ? "text-success" : "text-danger")">
+                                                        @submission.Grade.Value / @submission.Assignment.MaxPoints
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="text-muted">Pending</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(submission.Feedback))
+                                                {
+                                                    <button type="button" class="btn btn-sm btn-outline-info" data-bs-toggle="tooltip" title="@submission.Feedback">
+                                                        <i class="bi bi-chat-text"></i>
+                                                    </button>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+            
+            <div class="card shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="card-title mb-0">Grading Scale</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th>Grade</th>
+                                    <th>Range (%)</th>
+                                    <th>Points</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var grade in gradeScale)
+                                {
+                                    <tr>
+                                        <td>@grade.Key</td>
+                                        <td>@grade.Value</td>
+                                        <td>
+                                            @(grade.Key switch
+                                            {
+                                                "A" => "4.0",
+                                                "B+" => "3.5",
+                                                "B" => "3.0",
+                                                "C+" => "2.5",
+                                                "C" => "2.0",
+                                                "D+" => "1.5",
+                                                "D" => "1.0",
+                                                "F" => "0.0",
+                                                _ => "0.0"
+                                            })
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function () {
+            $('[data-bs-toggle="tooltip"]').tooltip();
+        });
+    </script>
+}

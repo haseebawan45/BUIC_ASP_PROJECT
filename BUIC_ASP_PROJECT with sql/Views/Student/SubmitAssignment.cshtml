@@ -1,0 +1,102 @@
+@model BUIC_ASP_PROJECT.Controllers.SubmissionViewModel
+@{
+    ViewData["Title"] = "Submit Assignment";
+}
+
+<div class="container-fluid py-4">
+    <h1 class="display-4 mb-4">Submit Assignment</h1>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">@Model.Assignment.Title</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6 class="fw-bold">Course:</h6>
+                        <p>@Model.Assignment.Course.CourseCode - @Model.Assignment.Course.Title</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6 class="fw-bold">Description:</h6>
+                        <p>@Model.Assignment.Description</p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6 class="fw-bold">Due Date:</h6>
+                        <p>@Model.Assignment.DueDate.ToString("MMMM dd, yyyy hh:mm tt")</p>
+                        
+                        @{
+                            var daysLeft = (Model.Assignment.DueDate - DateTime.Now).Days;
+                            var hoursLeft = (Model.Assignment.DueDate - DateTime.Now).Hours;
+                        }
+                        
+                        @if (DateTime.Now > Model.Assignment.DueDate)
+                        {
+                            <div class="alert alert-danger">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                This assignment is past due. Late submissions may be penalized.
+                            </div>
+                        }
+                        else if (daysLeft <= 1)
+                        {
+                            <div class="alert alert-warning">
+                                <i class="bi bi-clock-fill me-2"></i>
+                                Time remaining: @(daysLeft == 0 ? $"{hoursLeft} hour(s)" : "1 day and " + hoursLeft + " hour(s)")
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="alert alert-info">
+                                <i class="bi bi-clock-fill me-2"></i>
+                                Time remaining: @daysLeft days
+                            </div>
+                        }
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6 class="fw-bold">Maximum Points:</h6>
+                        <p>@Model.Assignment.MaxPoints</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="card-title mb-0">Submit Your Work</h5>
+                </div>
+                <div class="card-body">
+                    <form asp-action="SubmitAssignment" method="post" enctype="multipart/form-data">
+                        <input type="hidden" asp-for="AssignmentId" />
+                        
+                        <div class="mb-3">
+                            <label asp-for="Content" class="form-label">Comments/Notes</label>
+                            <textarea asp-for="Content" class="form-control" rows="5" placeholder="Add any comments or notes about your submission..."></textarea>
+                            <span asp-validation-for="Content" class="text-danger"></span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label asp-for="File" class="form-label">Upload File</label>
+                            <input asp-for="File" type="file" class="form-control" />
+                            <span asp-validation-for="File" class="text-danger"></span>
+                            <div class="form-text">Supported file types: .pdf, .doc, .docx, .ppt, .pptx, .zip</div>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-upload me-2"></i>Submit Assignment
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

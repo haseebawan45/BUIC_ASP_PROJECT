@@ -1,0 +1,190 @@
+@model IEnumerable<BUIC_ASP_PROJECT.Models.Course>
+@{
+    ViewData["Title"] = "Course Registration";
+}
+
+<div class="container-fluid py-4">
+    <h1 class="display-4 mb-4">Course Registration</h1>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Available Courses</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Title</th>
+                                    <th>Credit Hours</th>
+                                    <th>Instructor</th>
+                                    <th>Semester</th>
+                                    <th>Prerequisites</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var course in Model)
+                                {
+                                    var isRegistered = course.EnrolledStudents?.Any() == true;
+                                    var hasCompletedPrerequisites = true;
+                                    var missingPrerequisites = new List<string>();
+                                    
+                                    @if (course.Prerequisites?.Any() == true)
+                                    {
+                                        foreach (var prereq in course.Prerequisites)
+                                        {
+                                            if (!ViewBag.CompletedCourses.Contains(prereq.CourseId))
+                                            {
+                                                hasCompletedPrerequisites = false;
+                                                missingPrerequisites.Add(prereq.CourseCode);
+                                            }
+                                        }
+                                    }
+                                    
+                                    <tr>
+                                        <td>@course.CourseCode</td>
+                                        <td>@course.Title</td>
+                                        <td>@course.CreditHours</td>
+                                        <td>@(course.Instructor?.User?.FirstName + " " + course.Instructor?.User?.LastName)</td>
+                                        <td>@course.Semester</td>
+                                        <td>
+                                            @if (course.Prerequisites?.Any() == true)
+                                            {
+                                                <ul class="list-unstyled mb-0">
+                                                    @foreach (var prereq in course.Prerequisites)
+                                                    {
+                                                        <li>@prereq.CourseCode</li>
+                                                    }
+                                                </ul>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">None</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (isRegistered)
+                                            {
+                                                <span class="badge bg-success">Registered</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-secondary">Not Registered</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (!isRegistered)
+                                            {
+                                                @if (hasCompletedPrerequisites)
+                                                {
+                                                    <form asp-action="RegisterCourse" method="post">
+                                                        <input type="hidden" name="courseId" value="@course.CourseId" />
+                                                        <button type="submit" class="btn btn-sm btn-primary">Register</button>
+                                                    </form>
+                                                }
+                                                else
+                                                {
+                                                    <button class="btn btn-sm btn-secondary" disabled data-bs-toggle="tooltip" 
+                                                        title="Missing prerequisites: @string.Join(", ", missingPrerequisites)">
+                                                        Prerequisites Required
+                                                    </button>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <form asp-action="DropCourse" method="post">
+                                                    <input type="hidden" name="courseId" value="@course.CourseId" />
+                                                    <button type="submit" class="btn btn-sm btn-danger">Drop</button>
+                                                </form>
+                                            }
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0">Course Catalog</h5>
+                </div>
+                <div class="card-body">
+                    <div class="accordion" id="courseAccordion">
+                        @{
+                            var grouped = Model.GroupBy(c => c.Semester).OrderBy(g => g.Key);
+                        }
+                        
+                        @foreach (var semesterGroup in grouped)
+                        {
+                            <div class="accordion-item">
+                                <h2 class="accordion-header" id="heading@(semesterGroup.Key.Replace(" ", ""))">
+                                    <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                        data-bs-target="#collapse@(semesterGroup.Key.Replace(" ", ""))" aria-expanded="false" 
+                                        aria-controls="collapse@(semesterGroup.Key.Replace(" ", ""))">
+                                        @semesterGroup.Key - @semesterGroup.Count() courses
+                                    </button>
+                                </h2>
+                                <div id="collapse@(semesterGroup.Key.Replace(" ", ""))" class="accordion-collapse collapse" 
+                                    aria-labelledby="heading@(semesterGroup.Key.Replace(" ", ""))" data-bs-parent="#courseAccordion">
+                                    <div class="accordion-body">
+                                        <div class="row">
+                                            @foreach (var course in semesterGroup)
+                                            {
+                                                <div class="col-md-6 mb-3">
+                                                    <div class="card h-100">
+                                                        <div class="card-header">
+                                                            <h5 class="card-title mb-0">@course.CourseCode: @course.Title</h5>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            <p>@course.Description</p>
+                                                            <div class="d-flex justify-content-between">
+                                                                <span><strong>Credit Hours:</strong> @course.CreditHours</span>
+                                                                <span><strong>Instructor:</strong> @(course.Instructor?.User?.FirstName + " " + course.Instructor?.User?.LastName)</span>
+                                                            </div>
+                                                            
+                                                            @if (course.Prerequisites?.Any() == true)
+                                                            {
+                                                                <div class="mt-2">
+                                                                    <strong>Prerequisites:</strong>
+                                                                    <ul class="list-unstyled">
+                                                                        @foreach (var prereq in course.Prerequisites)
+                                                                        {
+                                                                            <li>@prereq.CourseCode - @prereq.Title</li>
+                                                                        }
+                                                                    </ul>
+                                                                </div>
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function () {
+            $('[data-bs-toggle="tooltip"]').tooltip();
+        });
+    </script>
+}

@@ -1,0 +1,130 @@
+@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="container my-4">
+    <h1 class="mb-4">Admin Dashboard</h1>
+
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card bg-primary text-white mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-0">@ViewBag.StudentCount</h3>
+                            <div>Students</div>
+                        </div>
+                        <i class="fas fa-user-graduate fa-3x"></i>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" asp-action="UserManagement">View Details</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-success text-white mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-0">@ViewBag.FacultyCount</h3>
+                            <div>Faculty</div>
+                        </div>
+                        <i class="fas fa-chalkboard-teacher fa-3x"></i>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" asp-action="UserManagement">View Details</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-info text-white mb-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h3 class="mb-0">@ViewBag.CourseCount</h3>
+                            <div>Courses</div>
+                        </div>
+                        <i class="fas fa-book fa-3x"></i>
+                    </div>
+                </div>
+                <div class="card-footer d-flex align-items-center justify-content-between">
+                    <a class="small text-white stretched-link" asp-action="CourseManagement">View Details</a>
+                    <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-chart-bar me-1"></i>
+                    Quick Actions
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        <a asp-controller="Account" asp-action="Register" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">Register New User</h5>
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <p class="mb-1">Add new students, faculty, or admin users to the system.</p>
+                        </a>
+                        <a asp-action="CourseManagement" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">Manage Courses</h5>
+                                <i class="fas fa-book-open"></i>
+                            </div>
+                            <p class="mb-1">Add, edit, or remove courses from the catalog.</p>
+                        </a>
+                        <a asp-action="FeeReports" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">Fee Reports</h5>
+                                <i class="fas fa-dollar-sign"></i>
+                            </div>
+                            <p class="mb-1">View and manage student fee information.</p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <i class="fas fa-chart-pie me-1"></i>
+                    System Reports
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        <a asp-action="RegistrationReports" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">Course Registration Statistics</h5>
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <p class="mb-1">View enrollment statistics for all courses.</p>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">Grade Distribution</h5>
+                                <i class="fas fa-chart-bar"></i>
+                            </div>
+                            <p class="mb-1">Analyze grade distribution across courses and departments.</p>
+                        </a>
+                        <a href="#" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">System Logs</h5>
+                                <i class="fas fa-clipboard-list"></i>
+                            </div>
+                            <p class="mb-1">Review system activity and security logs.</p>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

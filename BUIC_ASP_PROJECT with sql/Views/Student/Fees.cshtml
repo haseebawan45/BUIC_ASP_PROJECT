@@ -1,0 +1,246 @@
+@model IEnumerable<BUIC_ASP_PROJECT.Models.Fee>
+@{
+    ViewData["Title"] = "Fee Management";
+}
+
+<div class="container-fluid py-4">
+    <h1 class="display-4 mb-4">Fee Management</h1>
+    
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="card-title mb-0">Fee Statement</h5>
+                </div>
+                <div class="card-body">
+                    @if (!Model.Any())
+                    {
+                        <div class="alert alert-info">
+                            No fee records found for your account.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Semester</th>
+                                        <th>Amount</th>
+                                        <th>Due Date</th>
+                                        <th>Status</th>
+                                        <th>Payment Date</th>
+                                        <th>Transaction Ref</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var fee in Model)
+                                    {
+                                        <tr class="@(fee.IsPaid ? "" : (fee.DueDate < DateTime.Now ? "table-danger" : ""))">
+                                            <td>@fee.Semester</td>
+                                            <td>$@fee.Amount.ToString("0.00")</td>
+                                            <td>@fee.DueDate.ToString("MMM dd, yyyy")</td>
+                                            <td>
+                                                @if (fee.IsPaid)
+                                                {
+                                                    <span class="badge bg-success">Paid</span>
+                                                }
+                                                else if (fee.DueDate < DateTime.Now)
+                                                {
+                                                    <span class="badge bg-danger">Overdue</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge bg-warning text-dark">Pending</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @(fee.PaymentDate.HasValue ? fee.PaymentDate.Value.ToString("MMM dd, yyyy") : "-")
+                                            </td>
+                                            <td>
+                                                @(string.IsNullOrEmpty(fee.TransactionReference) ? "-" : fee.TransactionReference)
+                                            </td>
+                                            <td>
+                                                @if (!fee.IsPaid)
+                                                {
+                                                    <button type="button" class="btn btn-sm btn-primary" 
+                                                        data-bs-toggle="modal" data-bs-target="#paymentModal" 
+                                                        data-fee-id="@fee.FeeId" data-fee-amount="@fee.Amount">
+                                                        Pay Now
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <a href="#" class="btn btn-sm btn-outline-secondary" onclick="printReceipt(@fee.FeeId)">
+                                                        Receipt
+                                                    </a>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                                <tfoot>
+                                    <tr class="table-primary">
+                                        <td><strong>Total</strong></td>
+                                        <td><strong>$@Model.Sum(f => f.Amount).ToString("0.00")</strong></td>
+                                        <td colspan="5"></td>
+                                    </tr>
+                                    <tr class="table-success">
+                                        <td><strong>Paid</strong></td>
+                                        <td><strong>$@Model.Where(f => f.IsPaid).Sum(f => f.Amount).ToString("0.00")</strong></td>
+                                        <td colspan="5"></td>
+                                    </tr>
+                                    <tr class="table-danger">
+                                        <td><strong>Pending</strong></td>
+                                        <td><strong>$@Model.Where(f => !f.IsPaid).Sum(f => f.Amount).ToString("0.00")</strong></td>
+                                        <td colspan="5"></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="card-title mb-0">Payment Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h6 class="alert-heading"><i class="bi bi-info-circle-fill me-2"></i>Important Information</h6>
+                        <p>All fee payments must be completed by the due date to avoid late payment charges. A late fee of 5% will be applied to all overdue payments.</p>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h6 class="fw-bold">Payment Methods:</h6>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex align-items-center">
+                                <i class="bi bi-credit-card me-3 fs-4"></i>
+                                <div>
+                                    <strong>Credit/Debit Card</strong>
+                                    <div class="text-muted small">Visa, MasterCard, American Express</div>
+                                </div>
+                            </li>
+                            <li class="list-group-item d-flex align-items-center">
+                                <i class="bi bi-bank me-3 fs-4"></i>
+                                <div>
+                                    <strong>Bank Transfer</strong>
+                                    <div class="text-muted small">Direct bank deposit or wire transfer</div>
+                                </div>
+                            </li>
+                            <li class="list-group-item d-flex align-items-center">
+                                <i class="bi bi-wallet me-3 fs-4"></i>
+                                <div>
+                                    <strong>Online Payment</strong>
+                                    <div class="text-muted small">PayPal, Google Pay, Apple Pay</div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h6 class="fw-bold">Contact Financial Office:</h6>
+                        <address>
+                            <i class="bi bi-envelope me-2"></i> finance@university.edu<br>
+                            <i class="bi bi-telephone me-2"></i> (123) 456-7890<br>
+                            <i class="bi bi-geo-alt me-2"></i> Admin Building, Room 203
+                        </address>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Payment Modal -->
+<div class="modal fade" id="paymentModal" tabindex="-1" aria-labelledby="paymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="paymentModalLabel">Make Payment</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-action="ProcessFeePayment" method="post">
+                <div class="modal-body">
+                    <input type="hidden" id="feeId" name="feeId" />
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Amount to Pay</label>
+                        <div class="input-group">
+                            <span class="input-group-text">$</span>
+                            <input type="text" id="feeAmount" class="form-control" readonly />
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="paymentMethod" class="form-label">Payment Method</label>
+                        <select id="paymentMethod" name="paymentMethod" class="form-select">
+                            <option value="credit_card">Credit/Debit Card</option>
+                            <option value="bank_transfer">Bank Transfer</option>
+                            <option value="online_payment">Online Payment</option>
+                        </select>
+                    </div>
+                    
+                    <div id="creditCardFields">
+                        <div class="mb-3">
+                            <label for="cardNumber" class="form-label">Card Number</label>
+                            <input type="text" id="cardNumber" name="cardNumber" class="form-control" placeholder="XXXX XXXX XXXX XXXX" />
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="expiryDate" class="form-label">Expiry Date</label>
+                                <input type="text" id="expiryDate" name="expiryDate" class="form-control" placeholder="MM/YY" />
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="cvv" class="form-label">CVV</label>
+                                <input type="text" id="cvv" name="cvv" class="form-control" placeholder="XXX" />
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="cardholderName" class="form-label">Cardholder Name</label>
+                            <input type="text" id="cardholderName" name="cardholderName" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Complete Payment</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(function () {
+            $('#paymentModal').on('show.bs.modal', function (event) {
+                var button = $(event.relatedTarget);
+                var feeId = button.data('fee-id');
+                var feeAmount = button.data('fee-amount');
+                
+                $('#feeId').val(feeId);
+                $('#feeAmount').val(feeAmount.toFixed(2));
+            });
+            
+            $('#paymentMethod').change(function() {
+                if ($(this).val() === 'credit_card') {
+                    $('#creditCardFields').show();
+                } else {
+                    $('#creditCardFields').hide();
+                }
+            });
+        });
+        
+        function printReceipt(feeId) {
+            // Simulate opening a printable receipt
+            window.open('/Student/FeeReceipt/' + feeId, '_blank');
+        }
+    </script>
+}

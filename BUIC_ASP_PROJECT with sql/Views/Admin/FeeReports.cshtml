@@ -1,0 +1,214 @@
+@model IEnumerable<BUIC_ASP_PROJECT.Models.Fee>
+@{
+    ViewData["Title"] = "Fee Reports";
+    
+    // Calculate statistics
+    var totalFees = Model.Sum(f => f.Amount);
+    var paidFees = Model.Where(f => f.IsPaid).Sum(f => f.Amount);
+    var pendingFees = totalFees - paidFees;
+    var paymentRate = totalFees > 0 ? (paidFees / totalFees) * 100 : 0;
+    
+    // Group by semester
+    var semesterGroups = Model.GroupBy(f => f.Semester)
+        .Select(g => new {
+            Semester = g.Key,
+            Total = g.Sum(f => f.Amount),
+            Paid = g.Where(f => f.IsPaid).Sum(f => f.Amount),
+            Pending = g.Where(f => !f.IsPaid).Sum(f => f.Amount),
+            Count = g.Count()
+        })
+        .OrderBy(g => g.Semester)
+        .ToList();
+}
+
+<div class="container-fluid py-4">
+    <h1 class="display-4 mb-4">Fee Management Reports</h1>
+    
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card shadow-sm bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Total Fees</h5>
+                    <h2 class="mb-0">$@totalFees.ToString("N2")</h2>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card shadow-sm bg-success text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Paid Fees</h5>
+                    <h2 class="mb-0">$@paidFees.ToString("N2")</h2>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card shadow-sm bg-danger text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Pending Fees</h5>
+                    <h2 class="mb-0">$@pendingFees.ToString("N2")</h2>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-3">
+            <div class="card shadow-sm bg-info text-white">
+                <div class="card-body">
+                    <h5 class="card-title">Collection Rate</h5>
+                    <h2 class="mb-0">@paymentRate.ToString("N1")%</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Fee Collection by Semester</h5>
+                        <button type="button" class="btn btn-sm btn-light" onclick="exportToExcel('semesterTable')">
+                            <i class="bi bi-file-earmark-excel me-1"></i> Export
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="semesterTable" class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Semester</th>
+                                    <th>Students</th>
+                                    <th>Total Amount</th>
+                                    <th>Paid Amount</th>
+                                    <th>Pending Amount</th>
+                                    <th>Collection Rate</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var group in semesterGroups)
+                                {
+                                    var semesterPaymentRate = group.Total > 0 ? (group.Paid / group.Total) * 100 : 0;
+                                    <tr>
+                                        <td>@group.Semester</td>
+                                        <td>@group.Count</td>
+                                        <td>$@group.Total.ToString("N2")</td>
+                                        <td>$@group.Paid.ToString("N2")</td>
+                                        <td>$@group.Pending.ToString("N2")</td>
+                                        <td>
+                                            <div class="progress" style="height: 20px;">
+                                                <div class="progress-bar bg-success" role="progressbar" 
+                                                     style="width: @semesterPaymentRate%;" 
+                                                     aria-valuenow="@semesterPaymentRate" aria-valuemin="0" aria-valuemax="100">
+                                                    @semesterPaymentRate.ToString("N1")%
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0">Detailed Fee Records</h5>
+                        <div>
+                            <button type="button" class="btn btn-sm btn-light me-2" onclick="printReport()">
+                                <i class="bi bi-printer me-1"></i> Print
+                            </button>
+                            <button type="button" class="btn btn-sm btn-light" onclick="exportToExcel('detailedTable')">
+                                <i class="bi bi-file-earmark-excel me-1"></i> Export
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <input type="text" id="searchInput" class="form-control" placeholder="Search by student name, ID, or semester...">
+                    </div>
+                    
+                    <div class="table-responsive">
+                        <table id="detailedTable" class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Student ID</th>
+                                    <th>Student Name</th>
+                                    <th>Semester</th>
+                                    <th>Amount</th>
+                                    <th>Due Date</th>
+                                    <th>Status</th>
+                                    <th>Payment Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var fee in Model)
+                                {
+                                    <tr>
+                                        <td>@fee.Student.StudentNumber</td>
+                                        <td>@(fee.Student.User.FirstName + " " + fee.Student.User.LastName)</td>
+                                        <td>@fee.Semester</td>
+                                        <td>$@fee.Amount.ToString("N2")</td>
+                                        <td>@fee.DueDate.ToString("MMM dd, yyyy")</td>
+                                        <td>
+                                            @if (fee.IsPaid)
+                                            {
+                                                <span class="badge bg-success">Paid</span>
+                                            }
+                                            else if (fee.DueDate < DateTime.Now)
+                                            {
+                                                <span class="badge bg-danger">Overdue</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-warning text-dark">Pending</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @(fee.PaymentDate.HasValue ? fee.PaymentDate.Value.ToString("MMM dd, yyyy") : "-")
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Search functionality
+        $(document).ready(function() {
+            $("#searchInput").on("keyup", function() {
+                var value = $(this).val().toLowerCase();
+                $("#detailedTable tbody tr").filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+            });
+        });
+        
+        // Print report
+        function printReport() {
+            window.print();
+        }
+        
+        // Export to Excel
+        function exportToExcel(tableId) {
+            // In a real application, this would use a library like SheetJS or call a server endpoint
+            // For simplicity, we'll just simulate a download
+            alert("Exporting table to Excel... In a real application, this would download an Excel file.");
+        }
+    </script>
+}

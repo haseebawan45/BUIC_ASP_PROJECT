@@ -1,0 +1,132 @@
+@model BUIC_ASP_PROJECT.Models.Faculty
+
+@{
+    ViewData["Title"] = "Faculty Dashboard";
+}
+
+<div class="container my-4">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Faculty Profile</h5>
+                </div>
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        @if (string.IsNullOrEmpty(Model.User.ProfilePicture))
+                        {
+                            <img src="https://via.placeholder.com/150" class="rounded-circle img-thumbnail" alt="Profile Picture">
+                        }
+                        else
+                        {
+                            <img src="@Model.User.ProfilePicture" class="rounded-circle img-thumbnail" alt="Profile Picture">
+                        }
+                    </div>
+                    <h5 class="card-title">@Model.User.FirstName @Model.User.LastName</h5>
+                    <p class="card-text text-muted">@Model.FacultyNumber</p>
+                    <p class="card-text">@Model.Department</p>
+                    <p class="card-text">@Model.Designation</p>
+                </div>
+            </div>
+
+            <div class="list-group mb-4">
+                <a asp-action="Index" class="list-group-item list-group-item-action active">
+                    <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                </a>
+                <a asp-action="Courses" class="list-group-item list-group-item-action">
+                    <i class="fas fa-book me-2"></i> My Courses
+                </a>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-book-open me-2"></i> My Courses</h5>
+                </div>
+                <div class="card-body">
+                    @if (ViewBag.Courses != null && ((IEnumerable<Course>)ViewBag.Courses).Any())
+                    {
+                        <div class="row">
+                            @foreach (var course in ViewBag.Courses)
+                            {
+                                <div class="col-md-6 mb-4">
+                                    <div class="card h-100">
+                                        <div class="card-header bg-light">
+                                            <h5 class="mb-0">@course.CourseCode</h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <h6 class="card-title">@course.Title</h6>
+                                            <p class="card-text">@course.Description</p>
+                                            <p class="card-text"><small class="text-muted">@course.Semester | @course.CreditHours Credit Hours</small></p>
+                                            <a asp-action="CourseDetails" asp-route-id="@course.CourseId" class="btn btn-primary">Manage Course</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            You are not assigned to any courses. Please contact the administration.
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-clipboard-list me-2"></i> Recent Assignments</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group">
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">Database Design Project</h6>
+                                        <small>Due in 5 days</small>
+                                    </div>
+                                    <small class="text-muted">Database Systems</small>
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">Programming Assignment 2</h6>
+                                        <small>Due in 10 days</small>
+                                    </div>
+                                    <small class="text-muted">Programming Fundamentals</small>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-clipboard-check me-2"></i> Pending Submissions</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group">
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">5 submissions to grade</h6>
+                                        <small>Database Design Project</small>
+                                    </div>
+                                    <small class="text-muted">Database Systems</small>
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">8 submissions to grade</h6>
+                                        <small>Programming Assignment 1</small>
+                                    </div>
+                                    <small class="text-muted">Programming Fundamentals</small>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

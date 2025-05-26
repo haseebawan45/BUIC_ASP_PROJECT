@@ -1,0 +1,168 @@
+@model BUIC_ASP_PROJECT.Models.Student
+
+@{
+    ViewData["Title"] = "Student Dashboard";
+}
+
+<div class="container my-4">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Student Profile</h5>
+                </div>
+                <div class="card-body text-center">
+                    <div class="mb-3">
+                        @if (string.IsNullOrEmpty(Model.User.ProfilePicture))
+                        {
+                            <img src="https://via.placeholder.com/150" class="rounded-circle img-thumbnail" alt="Profile Picture">
+                        }
+                        else
+                        {
+                            <img src="@Model.User.ProfilePicture" class="rounded-circle img-thumbnail" alt="Profile Picture">
+                        }
+                    </div>
+                    <h5 class="card-title">@Model.User.FirstName @Model.User.LastName</h5>
+                    <p class="card-text text-muted">@Model.StudentNumber</p>
+                    <p class="card-text">@Model.Program</p>
+                    <p class="card-text"><span class="badge bg-info">Semester @Model.Semester</span></p>
+                    <p class="card-text"><strong>GPA:</strong> @Model.GPA</p>
+                </div>
+            </div>
+
+            <div class="list-group mb-4">
+                <a asp-action="Index" class="list-group-item list-group-item-action active">
+                    <i class="fas fa-tachometer-alt me-2"></i> Dashboard
+                </a>
+                <a asp-action="AcademicRecord" class="list-group-item list-group-item-action">
+                    <i class="fas fa-graduation-cap me-2"></i> Academic Record
+                </a>
+                <a asp-action="CourseRegistration" class="list-group-item list-group-item-action">
+                    <i class="fas fa-book-reader me-2"></i> Course Registration
+                </a>
+                <a asp-action="Assignments" class="list-group-item list-group-item-action">
+                    <i class="fas fa-tasks me-2"></i> Assignments
+                </a>
+                <a asp-action="Grades" class="list-group-item list-group-item-action">
+                    <i class="fas fa-chart-line me-2"></i> Grades
+                </a>
+                <a asp-action="Fees" class="list-group-item list-group-item-action">
+                    <i class="fas fa-money-bill-wave me-2"></i> Fees
+                </a>
+            </div>
+        </div>
+
+        <div class="col-md-9">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-bell me-2"></i> Announcements</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.EnrolledCourses != null && Model.EnrolledCourses.Any())
+                    {
+                        <div class="list-group">
+                            <a href="#" class="list-group-item list-group-item-action">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h5 class="mb-1">Midterm Schedule Released</h5>
+                                    <small>3 days ago</small>
+                                </div>
+                                <p class="mb-1">The midterm examination schedule has been released. Please check your email for details.</p>
+                                <small class="text-muted">Admin</small>
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            No announcements available. Please enroll in courses to receive announcements.
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-book me-2"></i> Enrolled Courses</h5>
+                </div>
+                <div class="card-body">
+                    @if (Model.EnrolledCourses != null && Model.EnrolledCourses.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Course Code</th>
+                                        <th>Course Title</th>
+                                        <th>Instructor</th>
+                                        <th>Credit Hours</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var course in Model.EnrolledCourses)
+                                    {
+                                        <tr>
+                                            <td>@course.Course.CourseCode</td>
+                                            <td>@course.Course.Title</td>
+                                            <td>@(course.Course.Instructor != null ? $"{course.Course.Instructor.User.FirstName} {course.Course.Instructor.User.LastName}" : "TBA")</td>
+                                            <td>@course.Course.CreditHours</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning">
+                            You are not enrolled in any courses. <a asp-action="CourseRegistration" class="alert-link">Click here</a> to register for courses.
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-tasks me-2"></i> Upcoming Assignments</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group">
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">Database Design Project</h6>
+                                        <small class="text-danger">Due in 2 days</small>
+                                    </div>
+                                    <small class="text-muted">Database Systems</small>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i> Academic Calendar</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group">
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">Midterm Examinations</h6>
+                                        <small>Oct 15-20, 2023</small>
+                                    </div>
+                                </a>
+                                <a href="#" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h6 class="mb-1">Final Examinations</h6>
+                                        <small>Dec 10-20, 2023</small>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 
