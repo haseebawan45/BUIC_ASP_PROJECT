@@ -1,0 +1,105 @@
+@{
+    ViewData["Title"] = "My Profile";
+    Layout = "_DashboardLayout";
+}
+
+<div class="dashboard-header">
+    <h1>My Profile</h1>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="dashboard-card text-center">
+            <img src="https://via.placeholder.com/150" class="rounded-circle mb-3" alt="Profile Picture">
+            <h2>@ViewBag.Username</h2>
+            <p class="text-muted">Student ID: ST12345</p>
+            <p class="text-muted">Computer Science Department</p>
+            <button class="btn btn-primary">Change Photo</button>
+        </div>
+    </div>
+    
+    <div class="col-md-8 mb-4">
+        <div class="dashboard-card">
+            <h2>Personal Information</h2>
+            <form>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="firstName" class="form-label">First Name</label>
+                        <input type="text" class="form-control" id="firstName" value="@ViewBag.Username" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="lastName" class="form-label">Last Name</label>
+                        <input type="text" class="form-control" id="lastName" value="Student" readonly>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" value="@(ViewBag.Username?.ToString().ToLower() + "@example.com")" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="phone" class="form-label">Phone Number</label>
+                        <input type="tel" class="form-control" id="phone" value="+1 234 567 8901" readonly>
+                    </div>
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="dob" class="form-label">Date of Birth</label>
+                        <input type="text" class="form-control" id="dob" value="15/05/2000" readonly>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="gender" class="form-label">Gender</label>
+                        <input type="text" class="form-control" id="gender" value="Male" readonly>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="address" class="form-label">Address</label>
+                    <textarea class="form-control" id="address" rows="3" readonly>123 College Street, University Town, State, 12345</textarea>
+                </div>
+                
+                <button type="button" class="btn btn-primary">Edit Profile</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 mb-4">
+        <div class="dashboard-card">
+            <h2>Academic Information</h2>
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <th style="width: 30%;">Department</th>
+                            <td>Computer Science</td>
+                        </tr>
+                        <tr>
+                            <th>Program</th>
+                            <td>Bachelor of Science in Computer Science</td>
+                        </tr>
+                        <tr>
+                            <th>Batch</th>
+                            <td>2022-2026</td>
+                        </tr>
+                        <tr>
+                            <th>Current Semester</th>
+                            <td>3rd Semester</td>
+                        </tr>
+                        <tr>
+                            <th>Academic Advisor</th>
+                            <td>Dr. Jane Smith</td>
+                        </tr>
+                        <tr>
+                            <th>CGPA</th>
+                            <td>3.75/4.00</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div> 

@@ -1,0 +1,184 @@
+@{
+    ViewData["Title"] = "Register Courses";
+    Layout = "_DashboardLayout";
+}
+
+<div class="dashboard-header">
+    <h1>Register Courses</h1>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="dashboard-card">
+            <h2>Registration Information</h2>
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <th>Registration Period</th>
+                            <td>Oct 15 - Oct 30, 2023</td>
+                        </tr>
+                        <tr>
+                            <th>Current Credits</th>
+                            <td>16</td>
+                        </tr>
+                        <tr>
+                            <th>Maximum Credits</th>
+                            <td>21</td>
+                        </tr>
+                        <tr>
+                            <th>Available Credits</th>
+                            <td>5</td>
+                        </tr>
+                        <tr>
+                            <th>Status</th>
+                            <td><span class="badge bg-success">Open</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-8 mb-4">
+        <div class="dashboard-card">
+            <h2>Available Courses</h2>
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Select</th>
+                            <th>Course Code</th>
+                            <th>Course Name</th>
+                            <th>Credits</th>
+                            <th>Instructor</th>
+                            <th>Schedule</th>
+                            <th>Seats</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="cs401">
+                                </div>
+                            </td>
+                            <td>CS401</td>
+                            <td>Artificial Intelligence</td>
+                            <td>3</td>
+                            <td>Dr. Alan Turing</td>
+                            <td>Mon, Wed 2:00 - 3:30 PM</td>
+                            <td>15/40</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="cs402">
+                                </div>
+                            </td>
+                            <td>CS402</td>
+                            <td>Machine Learning</td>
+                            <td>4</td>
+                            <td>Dr. Ada Lovelace</td>
+                            <td>Tue, Thu 9:00 - 10:30 AM</td>
+                            <td>22/35</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="cs403">
+                                </div>
+                            </td>
+                            <td>CS403</td>
+                            <td>Mobile App Development</td>
+                            <td>3</td>
+                            <td>Prof. Steve Jobs</td>
+                            <td>Wed, Fri 11:00 AM - 12:30 PM</td>
+                            <td>10/30</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="cs404">
+                                </div>
+                            </td>
+                            <td>CS404</td>
+                            <td>Cloud Computing</td>
+                            <td>3</td>
+                            <td>Dr. Grace Hopper</td>
+                            <td>Tue, Thu 2:00 - 3:30 PM</td>
+                            <td>25/40</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="mt-3">
+                    <button class="btn btn-primary">Register Selected Courses</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12 mb-4">
+        <div class="dashboard-card">
+            <h2>Current Registration</h2>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Course Code</th>
+                            <th>Course Name</th>
+                            <th>Credits</th>
+                            <th>Instructor</th>
+                            <th>Schedule</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>CS301</td>
+                            <td>Database Systems</td>
+                            <td>3</td>
+                            <td>Dr. Robert Johnson</td>
+                            <td>Mon, Wed 10:00 - 11:30 AM</td>
+                            <td><button class="btn btn-sm btn-danger">Drop</button></td>
+                        </tr>
+                        <tr>
+                            <td>CS302</td>
+                            <td>Web Development</td>
+                            <td>4</td>
+                            <td>Prof. Sarah Miller</td>
+                            <td>Tue, Thu 1:30 - 3:00 PM</td>
+                            <td><button class="btn btn-sm btn-danger">Drop</button></td>
+                        </tr>
+                        <tr>
+                            <td>CS303</td>
+                            <td>Computer Networks</td>
+                            <td>3</td>
+                            <td>Dr. Michael Wilson</td>
+                            <td>Tue, Thu 3:45 - 5:15 PM</td>
+                            <td><button class="btn btn-sm btn-danger">Drop</button></td>
+                        </tr>
+                        <tr>
+                            <td>CS304</td>
+                            <td>Software Engineering</td>
+                            <td>3</td>
+                            <td>Dr. Jennifer Lee</td>
+                            <td>Mon, Wed 1:00 - 2:30 PM</td>
+                            <td><button class="btn btn-sm btn-danger">Drop</button></td>
+                        </tr>
+                        <tr>
+                            <td>MATH201</td>
+                            <td>Discrete Mathematics</td>
+                            <td>3</td>
+                            <td>Prof. David Brown</td>
+                            <td>Fri 9:00 AM - 12:00 PM</td>
+                            <td><button class="btn btn-sm btn-danger">Drop</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div> 

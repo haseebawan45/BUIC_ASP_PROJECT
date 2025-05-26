@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Smart Campus</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/dashboard.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h3>Smart Campus</h3>
+                <div class="user-info mt-2">
+                    <p class="mb-0 text-white-50">Welcome, <strong>@ViewBag.Username</strong></p>
+                </div>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a asp-controller="Dashboard" asp-action="Profile" class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "Profile" ? "active" : "")">My Profile</a></li>
+                <li><a asp-controller="Dashboard" asp-action="Courses" class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "Courses" ? "active" : "")">My Courses</a></li>
+                <li><a asp-controller="Dashboard" asp-action="Grades" class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "Grades" ? "active" : "")">My Grades</a></li>
+                <li><a asp-controller="Dashboard" asp-action="Attendance" class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "Attendance" ? "active" : "")">My Attendance</a></li>
+                <li><a asp-controller="Dashboard" asp-action="Lectures" class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "Lectures" ? "active" : "")">My Lectures</a></li>
+                <li><a asp-controller="Dashboard" asp-action="Assignments" class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "Assignments" ? "active" : "")">Assignments</a></li>
+                <li><a asp-controller="Dashboard" asp-action="RegisterCourses" class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "RegisterCourses" ? "active" : "")">Register Courses</a></li>
+                <li><a asp-controller="Dashboard" asp-action="FeeDetails" class="@(ViewContext.RouteData.Values["Action"]?.ToString() == "FeeDetails" ? "active" : "")">Fee Details</a></li>
+                <li><a asp-controller="Home" asp-action="Index">Logout</a></li>
+            </ul>
+        </div>
+        <div class="main-content">
+            @RenderBody()
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html> 
